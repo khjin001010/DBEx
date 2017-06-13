@@ -1,6 +1,7 @@
 package khjin001010.kr.hs.emirim.dbex;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.v7.app.AppCompatActivity;
@@ -51,10 +52,25 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sqliteDb = myDb.getWritableDatabase(); //insert문을 실행해야 하니까 writable
-                String sql = "insert into idolTable values('"+edit_group_name.getText()+"', "+edit_group_count.getText()+")";
+                String sql = "insert into idoltable values('"+edit_group_name.getText()+"', "+edit_group_count.getText()+")";
                 sqliteDb.execSQL(sql);
                 sqliteDb.close();
                 Toast.makeText(MainActivity.this, "저장이 성공적으로 완료되었습니다.", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        but_select.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sqliteDb = myDb.getReadableDatabase(); //읽기 가능한 데이터베이스 | 변경 가능 - write , 조회만 - read
+                String sql = "select * from idoltable";
+                Cursor cursor = sqliteDb.rawQuery(sql, null); //결과행에 있는 데이터들을 선택해서 커서를 반환
+                String names = "Idol 이름"+"\r\n"+"==============================="+"\r\n"; //\r : 커서를 처음으로 옮겨줌
+                String counts = "Idol 인원수"+"\r\n"+"==============================="+"\r\n";
+                while(cursor.moveToNext()){ //next할 데이터행이 있는 동안 반복
+
+                }
+                sqliteDb.close();
             }
         });
     }
