@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
                 sqliteDb = myDb.getWritableDatabase(); //SQLiteDatabase 참조 값
                 myDb.onUpgrade(sqliteDb,1,2);
                 sqliteDb.close();
+                selet_click();
             }
         });
 
@@ -58,24 +59,14 @@ public class MainActivity extends AppCompatActivity {
                 sqliteDb.execSQL(sql);
                 sqliteDb.close();
                 Toast.makeText(MainActivity.this, "저장이 성공적으로 완료되었습니다.", Toast.LENGTH_LONG).show();
+                selet_click();
             }
         });
 
         but_select.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sqliteDb = myDb.getReadableDatabase(); //읽기 가능한 데이터베이스 | 변경 가능 - write , 조회만 - read
-                String sql = "select * from idoltable";
-                String names = "Idol 이름"+"\r\n"+"==================="+"\r\n"; //\r : 커서를 처음으로 옮겨줌
-                String counts = "Idol 인원수"+"\r\n"+"==================="+"\r\n";
-                Cursor cursor = sqliteDb.rawQuery(sql, null); //결과행에 있는 데이터들을 선택해서 커서를 반환
-                while(cursor.moveToNext()){ //next할 데이터행이 있는 동안 반복
-                    names += cursor.getString(0)+"\r\n";
-                    counts += cursor.getInt(1)+"\r\n";
-                }
-                edit_result_name.setText(names);
-                edit_result_count.setText(counts);
-                sqliteDb.close();
+               selet_click();
             }
         });
 
@@ -88,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
                 sqliteDb.execSQL(sql);
                 sqliteDb.close();
                 Toast.makeText(MainActivity.this, "수정이 성공적으로 완료되었습니다.", Toast.LENGTH_LONG).show();
+
+                selet_click();
             }
         });
 
@@ -99,6 +92,8 @@ public class MainActivity extends AppCompatActivity {
                 sqliteDb.execSQL(sql);
                 sqliteDb.close();
                 Toast.makeText(MainActivity.this, "삭제가 성공적으로 완료되었습니다.", Toast.LENGTH_LONG).show();
+
+                selet_click();
             }
         });
 
@@ -131,5 +126,19 @@ public class MainActivity extends AppCompatActivity {
             db.execSQL(sql);
             onCreate(db);
         }
+    }
+    public void selet_click(){
+        sqliteDb = myDb.getReadableDatabase(); //읽기 가능한 데이터베이스 | 변경 가능 - write , 조회만 - read
+        String sql = "select * from idoltable";
+        String names = "Idol 이름"+"\r\n"+"==================="+"\r\n"; //\r : 커서를 처음으로 옮겨줌
+        String counts = "Idol 인원수"+"\r\n"+"==================="+"\r\n";
+        Cursor cursor = sqliteDb.rawQuery(sql, null); //결과행에 있는 데이터들을 선택해서 커서를 반환
+        while(cursor.moveToNext()){ //next할 데이터행이 있는 동안 반복
+            names += cursor.getString(0)+"\r\n";
+            counts += cursor.getInt(1)+"\r\n";
+        }
+        edit_result_name.setText(names);
+        edit_result_count.setText(counts);
+        sqliteDb.close();
     }
 }
