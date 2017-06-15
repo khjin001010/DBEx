@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     Button butInit;
-    Button but_insert;
+    Button but_insert, but_update, but_delete;
     Button but_select;
     EditText edit_group_name;
     EditText edit_group_count;
@@ -30,10 +30,12 @@ public class MainActivity extends AppCompatActivity {
         butInit = (Button)findViewById(R.id.but_init);
         but_insert = (Button)findViewById(R.id.but_insert);
         but_select = (Button)findViewById(R.id.but_select);
+        but_update = (Button)findViewById(R.id.but_update);
         edit_group_name = (EditText)findViewById(R.id.edit_group_name);
         edit_group_count = (EditText)findViewById(R.id.edit_group_count);
         edit_result_name = (EditText)findViewById(R.id.edit_result_name);
         edit_result_count = (EditText)findViewById(R.id.edit_result_cout);
+        but_delete = (Button)findViewById(R.id.but_delete);
 
         //DB생성
         myDb = new MyDBHelper(this); // == myHelper 라고 쓰는 것도 좋다(변수명)
@@ -52,15 +54,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 sqliteDb = myDb.getWritableDatabase(); //insert문을 실행해야 하니까 writable
-                String sql2 = "select * from idoltable";
-                Cursor cursor = sqliteDb.rawQuery(sql2, null);
-                cursor.moveToFirst();
                 String sql = "insert into idoltable values('"+edit_group_name.getText()+"', "+edit_group_count.getText()+")";
-                while(cursor.moveToNext()){
-                    if(edit_group_name.getText().equals(cursor.getString(0))){
-                        sql = "update idoltable set idolCount="+edit_result_count.getText()+" where idolName='"+edit_group_name.getText()+"'";
-                    }
-                }
                 sqliteDb.execSQL(sql);
                 sqliteDb.close();
                 Toast.makeText(MainActivity.this, "저장이 성공적으로 완료되었습니다.", Toast.LENGTH_LONG).show();
@@ -72,19 +66,42 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 sqliteDb = myDb.getReadableDatabase(); //읽기 가능한 데이터베이스 | 변경 가능 - write , 조회만 - read
                 String sql = "select * from idoltable";
+                String names = "Idol 이름"+"\r\n"+"==================="+"\r\n"; //\r : 커서를 처음으로 옮겨줌
+                String counts = "Idol 인원수"+"\r\n"+"==================="+"\r\n";
                 Cursor cursor = sqliteDb.rawQuery(sql, null); //결과행에 있는 데이터들을 선택해서 커서를 반환
-                String names = "Idol 이름"+"\r\n"+"==============================="+"\r\n"; //\r : 커서를 처음으로 옮겨줌
-                String counts = "Idol 인원수"+"\r\n"+"==============================="+"\r\n";
                 while(cursor.moveToNext()){ //next할 데이터행이 있는 동안 반복
                     names += cursor.getString(0)+"\r\n";
                     counts += cursor.getInt(1)+"\r\n";
                 }
                 edit_result_name.setText(names);
                 edit_result_count.setText(counts);
-                cursor.close();
                 sqliteDb.close();
             }
         });
+
+        but_update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String sql = "update idoltable set idolCount="+edit_group_count.getText()+" where idolName='"+edit_group_name.getText()+"'";
+                String sql2 = "select * from idoltable";
+                sqliteDb = myDb.getReadableDatabase();
+                sqliteDb.execSQL(sql);
+                sqliteDb.close();
+                Toast.makeText(MainActivity.this, "수정이 성공적으로 완료되었습니다.", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        but_delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sqliteDb = myDb.getWritableDatabase();
+                String sql = "delete from idoltable where idolName = '"+edit_group_name.getText()+"'";
+                sqliteDb.execSQL(sql);
+                sqliteDb.close();
+                Toast.makeText(MainActivity.this, "삭제가 성공적으로 완료되었습니다.", Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     // 내부 클래스 생성
